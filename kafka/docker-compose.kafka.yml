@@ -10,6 +10,8 @@ services:
     restart: unless-stopped
     networks:
       - lab-network
+    ports:
+      - "9091:9091"
     environment:
       KAFKA_PROCESS_ROLES: controller
       KAFKA_NODE_ID: 1
@@ -22,17 +24,17 @@ services:
       CLUSTER_ID: ${KAFKA_CLUSTER_ID}
       KAFKA_LOG_DIRS: /var/lib/kafka/data
 
-      KAFKA_JMX_PORT: 9101
-      KAFKA_JMX_HOSTNAME: kafka-controller-1
+      # KAFKA_JMX_PORT: 9101
+      # KAFKA_JMX_HOSTNAME: kafka-controller-1
       KAFKA_JMX_OPTS: >
+        -javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=9091:/opt/jmx-exporter/kafka-broker.yml
         -Dcom.sun.management.jmxremote
         -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false
-        -Dcom.sun.management.jmxremote.rmi.port=9101
-        -Djava.rmi.server.hostname=kafka-controller-1
 
     volumes:
       - kafka-controller-1-data:/var/lib/kafka/data
+      - ./jmx-exporter:/opt/jmx-exporter
 
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 19092 || exit 1"]
@@ -44,6 +46,8 @@ services:
     image: confluentinc/cp-kafka:7.6.0
     container_name: kafka-controller-2
     hostname: kafka-controller-2
+    ports:
+      - "9092:9091"
     restart: unless-stopped
     networks:
       - lab-network
@@ -59,17 +63,17 @@ services:
       CLUSTER_ID: ${KAFKA_CLUSTER_ID}
       KAFKA_LOG_DIRS: /var/lib/kafka/data
 
-      KAFKA_JMX_PORT: 9102
-      KAFKA_JMX_HOSTNAME: kafka-controller-2
+      # KAFKA_JMX_PORT: 9102
+      # KAFKA_JMX_HOSTNAME: kafka-controller-2
       KAFKA_JMX_OPTS: >
+        -javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=9091:/opt/jmx-exporter/kafka-broker.yml
         -Dcom.sun.management.jmxremote
         -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false
-        -Dcom.sun.management.jmxremote.rmi.port=9102
-        -Djava.rmi.server.hostname=kafka-controller-2
 
     volumes:
       - kafka-controller-2-data:/var/lib/kafka/data
+      - ./jmx-exporter:/opt/jmx-exporter
 
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 29092 || exit 1"]
@@ -79,6 +83,8 @@ services:
     container_name: kafka-controller-3
     hostname: kafka-controller-3
     restart: unless-stopped
+    ports:
+      - "9093:9091"
     networks:
       - lab-network
     environment:
@@ -96,14 +102,14 @@ services:
       KAFKA_JMX_PORT: 9103
       KAFKA_JMX_HOSTNAME: kafka-controller-3
       KAFKA_JMX_OPTS: >
+        -javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=9091:/opt/jmx-exporter/kafka-broker.yml
         -Dcom.sun.management.jmxremote
         -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false
-        -Dcom.sun.management.jmxremote.rmi.port=9103
-        -Djava.rmi.server.hostname=kafka-controller-3
 
     volumes:
       - kafka-controller-3-data:/var/lib/kafka/data
+      - ./jmx-exporter:/opt/jmx-exporter
 
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 39092 || exit 1"]
@@ -135,8 +141,8 @@ services:
       CLUSTER_ID: ${KAFKA_CLUSTER_ID}
       KAFKA_LOG_DIRS: /var/lib/kafka/data
 
-      KAFKA_JMX_PORT: 9104
-      KAFKA_JMX_HOSTNAME: kafka-broker-1
+      # KAFKA_JMX_PORT: 9104
+      # KAFKA_JMX_HOSTNAME: kafka-broker-1
       KAFKA_JMX_OPTS: >
         -javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=7071:/opt/jmx-exporter/kafka-broker.yml
         -Dcom.sun.management.jmxremote
@@ -173,8 +179,8 @@ services:
       CLUSTER_ID: ${KAFKA_CLUSTER_ID}
       KAFKA_LOG_DIRS: /var/lib/kafka/data
 
-      KAFKA_JMX_PORT: 9105
-      KAFKA_JMX_HOSTNAME: kafka-broker-2
+      # KAFKA_JMX_PORT: 9105
+      # KAFKA_JMX_HOSTNAME: kafka-broker-2
       KAFKA_JMX_OPTS: >
         -javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=7071:/opt/jmx-exporter/kafka-broker.yml
         -Dcom.sun.management.jmxremote
@@ -210,8 +216,8 @@ services:
       CLUSTER_ID: ${KAFKA_CLUSTER_ID}
       KAFKA_LOG_DIRS: /var/lib/kafka/data
 
-      KAFKA_JMX_PORT: 9106
-      KAFKA_JMX_HOSTNAME: kafka-broker-3
+      # KAFKA_JMX_PORT: 9106
+      # KAFKA_JMX_HOSTNAME: kafka-broker-3
       KAFKA_JMX_OPTS: >
         -javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=7071:/opt/jmx-exporter/kafka-broker.yml
         -Dcom.sun.management.jmxremote

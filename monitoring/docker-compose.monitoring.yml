@@ -10,10 +10,12 @@ services:
       - "9090:9090"
     volumes:
       - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./configs/prometheus/alerts.yml:/etc/prometheus/alerts.yml
       - prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
 
   grafana:
     image: grafana/grafana:10.2.2

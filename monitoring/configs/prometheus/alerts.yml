@@ -1,0 +1,39 @@
+groups:
+  - name: kafka_alerts
+    interval: 30s
+    rules:
+      - alert: KafkaBrokerDown
+        expr: up{job="kafka-brokers"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kafka broker {{ $labels.instance }} is down"
+          description: "Broker has been down for more than 1 minute"
+
+      - alert: UnderReplicatedPartitions
+        expr: kafka_server_replicamanager_underreplicatedpartitions > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Under-replicated partitions detected"
+          description: "{{ $labels.instance }} has {{ $value }} under-replicated partitions"
+
+      - alert: HighJVMMemoryUsage
+        expr: (jvm_memory_bytes_used / jvm_memory_bytes_max) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High JVM memory usage on {{ $labels.instance }}"
+          description: "JVM memory usage is above 90%"
+
+      - alert: NoActiveController
+        expr: sum(kafka_controller_kafkacontroller_activecontrollercount) == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "No active Kafka controller"
+          description: "Cluster has no active controller for more than 1 minute"
