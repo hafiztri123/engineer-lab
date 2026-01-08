@@ -99,8 +99,8 @@ services:
       CLUSTER_ID: ${KAFKA_CLUSTER_ID}
       KAFKA_LOG_DIRS: /var/lib/kafka/data
 
-      KAFKA_JMX_PORT: 9103
-      KAFKA_JMX_HOSTNAME: kafka-controller-3
+      # KAFKA_JMX_PORT: 9103
+      # KAFKA_JMX_HOSTNAME: kafka-controller-3
       KAFKA_JMX_OPTS: >
         -javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=9091:/opt/jmx-exporter/kafka-broker.yml
         -Dcom.sun.management.jmxremote
