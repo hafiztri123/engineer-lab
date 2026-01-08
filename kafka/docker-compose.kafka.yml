@@ -8,6 +8,8 @@ services:
     container_name: kafka-controller-1
     hostname: kafka-controller-1
     restart: unless-stopped
+    networks:
+      - lab-network
     environment:
       KAFKA_PROCESS_ROLES: controller
       KAFKA_NODE_ID: 1
@@ -43,6 +45,8 @@ services:
     container_name: kafka-controller-2
     hostname: kafka-controller-2
     restart: unless-stopped
+    networks:
+      - lab-network
     environment:
       KAFKA_PROCESS_ROLES: controller
       KAFKA_NODE_ID: 2
@@ -75,6 +79,8 @@ services:
     container_name: kafka-controller-3
     hostname: kafka-controller-3
     restart: unless-stopped
+    networks:
+      - lab-network
     environment:
       KAFKA_PROCESS_ROLES: controller
       KAFKA_NODE_ID: 3
@@ -112,6 +118,9 @@ services:
     restart: unless-stopped
     ports:
       - "19092:9092"
+      - "7071:7071"
+    networks:
+      - lab-network
     environment:
       KAFKA_PROCESS_ROLES: broker
       KAFKA_NODE_ID: 101
@@ -129,15 +138,14 @@ services:
       KAFKA_JMX_PORT: 9104
       KAFKA_JMX_HOSTNAME: kafka-broker-1
       KAFKA_JMX_OPTS: >
+        -javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=7071:/opt/jmx-exporter/kafka-broker.yml
         -Dcom.sun.management.jmxremote
         -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false
-        -Dcom.sun.management.jmxremote.rmi.port=9104
-        -Djava.rmi.server.hostname=kafka-broker-1
 
     volumes:
       - kafka-broker-1-data:/var/lib/kafka/data
-
+      - ./jmx-exporter:/opt/jmx-exporter
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 9093 || exit 1"]
 
@@ -148,6 +156,9 @@ services:
     restart: unless-stopped
     ports:
       - "19093:9092"
+      - "7072:7071"
+    networks:
+      - lab-network
     environment:
       KAFKA_PROCESS_ROLES: broker
       KAFKA_NODE_ID: 102
@@ -165,14 +176,15 @@ services:
       KAFKA_JMX_PORT: 9105
       KAFKA_JMX_HOSTNAME: kafka-broker-2
       KAFKA_JMX_OPTS: >
+        -javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=7071:/opt/jmx-exporter/kafka-broker.yml
         -Dcom.sun.management.jmxremote
         -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false
-        -Dcom.sun.management.jmxremote.rmi.port=9105
-        -Djava.rmi.server.hostname=kafka-broker-2
+
 
     volumes:
       - kafka-broker-2-data:/var/lib/kafka/data
+      - ./jmx-exporter:/opt/jmx-exporter
 
   kafka-broker-3:
     image: confluentinc/cp-kafka:7.6.0
@@ -181,6 +193,9 @@ services:
     restart: unless-stopped
     ports:
       - "19094:9092"
+      - "7073:7071"
+    networks:
+      - lab-network
     environment:
       KAFKA_PROCESS_ROLES: broker
       KAFKA_NODE_ID: 103
@@ -198,50 +213,19 @@ services:
       KAFKA_JMX_PORT: 9106
       KAFKA_JMX_HOSTNAME: kafka-broker-3
       KAFKA_JMX_OPTS: >
+        -javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=7071:/opt/jmx-exporter/kafka-broker.yml
         -Dcom.sun.management.jmxremote
         -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false
-        -Dcom.sun.management.jmxremote.rmi.port=9106
-        -Djava.rmi.server.hostname=kafka-broker-3
 
     volumes:
       - kafka-broker-3-data:/var/lib/kafka/data
+      - ./jmx-exporter:/opt/jmx-exporter
 
 
   # =====================
   # Misc
   # =====================
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-    environment:
-      DYNAMIC_CONFIG_ENABLED: true
-      KAFKA_CLUSTERS_0_NAME: local-kraft-CLUSTER_ID
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker-1:9093,kafka-broker-2:9093,kafka-broker-3:9093
-      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
-    depends_on:
-      - kafka-broker-1
-      - kafka-broker-2
-      - kafka-broker-3
-      - schema-registry  
-
-
-  schema-registry:
-    image: confluentinc/cp-schema-registry:7.6.0
-    container_name: schema-registry
-    restart: unless-stopped
-    ports:
-      - "8081:8081"
-    environment:
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-broker-1:9093,kafka-broker-2:9093,kafka-broker-3:9093
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
-    depends_on:
-      - kafka-broker-1
-
 
   kafka-connect:
     image: confluentinc/cp-kafka-connect:7.6.0
@@ -249,6 +233,8 @@ services:
     restart: unless-stopped
     ports:
       - "8083:8083"
+    networks:
+      - lab-network
     environment:
       CONNECT_BOOTSTRAP_SERVERS: kafka-broker-1:9093,kafka-broker-2:9093,kafka-broker-3:9093
       CONNECT_REST_PORT: 8083
@@ -262,9 +248,6 @@ services:
       CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
     depends_on:
       - kafka-broker-1
-    volumes:
-      - ./connectors:/usr/share/confluent-hub-components
-          
 
 
 volumes:
@@ -274,3 +257,7 @@ volumes:
   kafka-broker-1-data:
   kafka-broker-2-data:
   kafka-broker-3-data:
+
+networks:
+  lab-network:
+    external: true

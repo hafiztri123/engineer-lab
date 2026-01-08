@@ -1,0 +1,31 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Kafka Brokers (direct JMX)
+  - job_name: 'kafka-brokers'
+    static_configs:
+      - targets:
+          - 'kafka-broker-1:7071'
+          - 'kafka-broker-2:7071'
+          - 'kafka-broker-3:7071'
+        labels:
+          cluster: 'local-kraft'
+          component: 'broker'
+
+  # Kafka Controllers
+  - job_name: 'kafka-controllers'
+    static_configs:
+      - targets:
+          - 'kafka-controller-1:9101'
+          - 'kafka-controller-2:9102'
+          - 'kafka-controller-3:9103'
+        labels:
+          cluster: 'local-kraft'
+          component: 'controller'
+
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
