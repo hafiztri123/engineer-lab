@@ -1,0 +1,8 @@
+include:
+  - kafka/docker-compose.kafka.yml
+  - monitoring/docker-compose.monitoring.yml
+  - ui/docker-compose.ui.yml
+
+networks:
+  lab-network:
+    external: true

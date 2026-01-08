@@ -1,0 +1,16 @@
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+
+whitelistObjectNames:
+  - "kafka.server:type=BrokerTopicMetrics,*"
+  - "kafka.server:type=ReplicaManager,*"
+  - "kafka.server:type=KafkaRequestHandlerPool,*"
+  - "kafka.network:type=RequestMetrics,*"
+  - "kafka.controller:type=KafkaController,*"
+  - "kafka.log:type=LogFlushStats,*"
+  - "java.lang:type=GarbageCollector,*"
+  - "java.lang:type=Memory,*"
+  - "java.lang:type=OperatingSystem,*"
+
+rules:
+  - pattern: ".*"
