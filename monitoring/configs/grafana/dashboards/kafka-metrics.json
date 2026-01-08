@@ -1,0 +1,55 @@
+{
+    "title": "Kafka Cluster Metrics",
+    "tags": ["kafka"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Broker Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"kafka-brokers\"}",
+            "legendFormat": "{{instance}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 }
+      },
+      {
+        "id": 2,
+        "title": "Messages In Per Sec",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(kafka_server_brokertopicmetrics_messagesin_total[5m])",
+            "legendFormat": "{{instance}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
+      },
+      {
+        "id": 3,
+        "title": "JVM Memory Used",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "jvm_memory_bytes_used{job=\"kafka-brokers\"}",
+            "legendFormat": "{{instance}} - {{area}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
+      },
+      {
+        "id": 4,
+        "title": "Active Controller Count",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "kafka_controller_kafkacontroller_activecontrollercount",
+            "legendFormat": "Active Controllers"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
+      }
+    ]
+}
